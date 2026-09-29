@@ -1,0 +1,172 @@
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/gen2"))()
+
+--// Rayfield Window
+local Window = Rayfield:CreateWindow({
+    name = "IMMIE HUB",
+    subtitle = "TBSOBR",
+    sidebarLayout = true,
+})
+
+local Skips = Window:CreateTab({
+    name = "Skips",
+    icon = 6031091002,
+})
+
+--// Toggle states
+local skipDialogue = false
+local endlessMode = false
+local foolsMode = false
+local godMode = false
+
+--// Generic ClickDetector finder
+local function clickDetector(path)
+    local current = workspace
+
+    for _, name in ipairs(path) do
+        current = current:FindFirstChild(name)
+
+        if not current then
+            return nil
+        end
+    end
+
+    if current:IsA("ClickDetector") then
+        return current
+    end
+
+    return nil
+end
+
+--// Skip Dialogue
+Skips:CreateToggle({
+    name = "Skip Dialogue",
+    flag = "SkipDialogue",
+    callback = function(value)
+        skipDialogue = value
+    end,
+})
+
+--// Endless Mode Vote
+Skips:CreateToggle({
+    name = "Endless Mode Vote",
+    flag = "EndlessModeVote",
+    callback = function(value)
+        endlessMode = value
+    end,
+})
+
+--// Fools Mode
+Skips:CreateToggle({
+    name = "Fools Mode",
+    flag = "FoolsMode",
+    callback = function(value)
+        foolsMode = value
+    end,
+})
+
+--// God Mode Vote
+Skips:CreateToggle({
+    name = "God Mode Vote",
+    flag = "GodModeVote",
+    callback = function(value)
+        godMode = value
+    end,
+})
+
+--// Auto-click loop
+task.spawn(function()
+    while task.wait(0.1) do
+
+        if skipDialogue then
+            local detector = clickDetector({"SkipDialogue", "ClickDetector"})
+            if detector then
+                fireclickdetector(detector)
+            end
+        end
+
+        if endlessMode then
+            local detector = clickDetector({"EndlessModeVote", "ClickDetector"})
+            if detector then
+                fireclickdetector(detector)
+            end
+        end
+
+        if foolsMode then
+            local detector = clickDetector({"FoolsMode", "ClickDetector"})
+            if detector then
+                fireclickdetector(detector)
+            end
+        end
+
+        if godMode then
+            local detector = clickDetector({"GodModeVote", "ClickDetector"})
+            if detector then
+                fireclickdetector(detector)
+            end
+        end
+
+    end
+end)
+
+--// Small draggable circle
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+local gui = Instance.new("ScreenGui")
+gui.Name = "IMMIE_HUB_Toggle"
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local circle = Instance.new("TextButton")
+circle.Name = "OpenButton"
+circle.Size = UDim2.fromOffset(48, 48)
+circle.Position = UDim2.new(0, 20, 0.5, -24)
+circle.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+circle.Text = "I"
+circle.TextColor3 = Color3.fromRGB(255, 255, 255)
+circle.TextSize = 22
+circle.Font = Enum.Font.GothamBold
+circle.Parent = gui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(1, 0)
+corner.Parent = circle
+
+--// Dragging
+local dragging = false
+local dragStart
+local startPos
+
+circle.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1
+        or input.UserInputType == Enum.UserInputType.Touch then
+
+        dragging = true
+        dragStart = input.Position
+        startPos = circle.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and (
+        input.UserInputType == Enum.UserInputType.MouseMovement
+        or input.UserInputType == Enum.UserInputType.Touch
+    ) then
+
+        local delta = input.Position - dragStart
+
+        circle.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
+end)
