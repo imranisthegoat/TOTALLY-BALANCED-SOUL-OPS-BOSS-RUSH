@@ -1,6 +1,5 @@
 local Rayfield = loadstring(game:HttpGet("https://sirius.menu/gen2"))()
 
---// Rayfield Window
 local Window = Rayfield:CreateWindow({
     name = "IMMIE HUB",
     subtitle = "TBSOBR",
@@ -12,32 +11,28 @@ local Skips = Window:CreateTab({
     icon = 6031091002,
 })
 
---// Toggle states
 local skipDialogue = false
 local endlessMode = false
 local foolsMode = false
 local godMode = false
+local boneFlame = false
 
---// Generic ClickDetector finder
-local function clickDetector(path)
-    local current = workspace
+local function getDetector(name)
+    local object = workspace:FindFirstChild(name)
 
-    for _, name in ipairs(path) do
-        current = current:FindFirstChild(name)
-
-        if not current then
-            return nil
-        end
+    if not object then
+        return nil
     end
 
-    if current:IsA("ClickDetector") then
-        return current
+    local detector = object:FindFirstChild("ClickDetector")
+
+    if detector and detector:IsA("ClickDetector") then
+        return detector
     end
 
     return nil
 end
 
---// Skip Dialogue
 Skips:CreateToggle({
     name = "Skip Dialogue",
     flag = "SkipDialogue",
@@ -46,7 +41,6 @@ Skips:CreateToggle({
     end,
 })
 
---// Endless Mode Vote
 Skips:CreateToggle({
     name = "Endless Mode Vote",
     flag = "EndlessModeVote",
@@ -55,7 +49,6 @@ Skips:CreateToggle({
     end,
 })
 
---// Fools Mode
 Skips:CreateToggle({
     name = "Fools Mode",
     flag = "FoolsMode",
@@ -64,7 +57,6 @@ Skips:CreateToggle({
     end,
 })
 
---// God Mode Vote
 Skips:CreateToggle({
     name = "God Mode Vote",
     flag = "GodModeVote",
@@ -73,78 +65,92 @@ Skips:CreateToggle({
     end,
 })
 
---// Auto-click loop
+Skips:CreateToggle({
+    name = "Bone Flame",
+    flag = "BoneFlame",
+    callback = function(value)
+        boneFlame = value
+    end,
+})
+
 task.spawn(function()
     while task.wait(0.1) do
-
         if skipDialogue then
-            local detector = clickDetector({"SkipDialogue", "ClickDetector"})
+            local detector = getDetector("SkipDialogue")
             if detector then
                 fireclickdetector(detector)
             end
         end
 
         if endlessMode then
-            local detector = clickDetector({"EndlessModeVote", "ClickDetector"})
+            local detector = getDetector("EndlessModeVote")
             if detector then
                 fireclickdetector(detector)
             end
         end
 
         if foolsMode then
-            local detector = clickDetector({"FoolsMode", "ClickDetector"})
+            local detector = getDetector("FoolsMode")
             if detector then
                 fireclickdetector(detector)
             end
         end
 
         if godMode then
-            local detector = clickDetector({"GodModeVote", "ClickDetector"})
+            local detector = getDetector("GodModeVote")
             if detector then
                 fireclickdetector(detector)
             end
         end
 
+        if boneFlame then
+            local detector = getDetector("BoneFlame")
+            if detector then
+                fireclickdetector(detector)
+            end
+        end
     end
 end)
 
---// Small draggable circle
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 
-local player = Players.LocalPlayer
-local gui = Instance.new("ScreenGui")
-gui.Name = "IMMIE_HUB_Toggle"
-gui.ResetOnSpawn = false
-gui.Parent = player:WaitForChild("PlayerGui")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
-local circle = Instance.new("TextButton")
-circle.Name = "OpenButton"
-circle.Size = UDim2.fromOffset(48, 48)
-circle.Position = UDim2.new(0, 20, 0.5, -24)
-circle.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-circle.Text = "I"
-circle.TextColor3 = Color3.fromRGB(255, 255, 255)
-circle.TextSize = 22
-circle.Font = Enum.Font.GothamBold
-circle.Parent = gui
+local CircleGui = Instance.new("ScreenGui")
+CircleGui.Name = "IMMIE_HUB_Circle"
+CircleGui.ResetOnSpawn = false
+CircleGui.Parent = PlayerGui
 
-local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(1, 0)
-corner.Parent = circle
+local Circle = Instance.new("TextButton")
+Circle.Name = "OpenButton"
+Circle.Size = UDim2.fromOffset(48, 48)
+Circle.Position = UDim2.new(0, 20, 0.5, -24)
+Circle.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Circle.Text = "I"
+Circle.TextColor3 = Color3.fromRGB(255, 255, 255)
+Circle.TextSize = 22
+Circle.Font = Enum.Font.GothamBold
+Circle.Parent = CircleGui
 
---// Dragging
+local Corner = Instance.new("UICorner")
+Corner.CornerRadius = UDim.new(1, 0)
+Corner.Parent = Circle
+
 local dragging = false
 local dragStart
-local startPos
+local startPosition
+local moved = false
 
-circle.InputBegan:Connect(function(input)
+Circle.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1
         or input.UserInputType == Enum.UserInputType.Touch then
 
         dragging = true
+        moved = false
         dragStart = input.Position
-        startPos = circle.Position
+        startPosition = Circle.Position
 
         input.Changed:Connect(function()
             if input.UserInputState == Enum.UserInputState.End then
@@ -155,18 +161,24 @@ circle.InputBegan:Connect(function(input)
 end)
 
 UserInputService.InputChanged:Connect(function(input)
-    if dragging and (
-        input.UserInputType == Enum.UserInputType.MouseMovement
-        or input.UserInputType == Enum.UserInputType.Touch
-    ) then
+    if not dragging then
+        return
+    end
+
+    if input.UserInputType == Enum.UserInputType.MouseMovement
+        or input.UserInputType == Enum.UserInputType.Touch then
 
         local delta = input.Position - dragStart
 
-        circle.Position = UDim2.new(
-            startPos.X.Scale,
-            startPos.X.Offset + delta.X,
-            startPos.Y.Scale,
-            startPos.Y.Offset + delta.Y
+        if delta.Magnitude > 5 then
+            moved = true
+        end
+
+        Circle.Position = UDim2.new(
+            startPosition.X.Scale,
+            startPosition.X.Offset + delta.X,
+            startPosition.Y.Scale,
+            startPosition.Y.Offset + delta.Y
         )
     end
 end)
