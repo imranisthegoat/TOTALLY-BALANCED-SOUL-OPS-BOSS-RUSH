@@ -231,3 +231,133 @@ LocalPlayer.CharacterAdded:Connect(function(character)
         startBossFloat(character)
     end
 end)
+
+local AutoSpawn = Window:CreateTab({
+    name = "Auto Spawn",
+    icon = 6031091002,
+})
+
+local selectedMorph = "V404"
+local autoSpawnEnabled = false
+
+local morphs = {
+    "V404",
+    "True Pablo",
+    "King Multiverse",
+    "ERRORSIPHONER",
+    "Sansta",
+    "KJ",
+    "HyperDust",
+    "Spamton"
+}
+
+local morphPaths = {
+    ["V404"] = function()
+        local model = workspace:FindFirstChild("Virus404Sans")
+        return model and model:FindFirstChild("Morph")
+    end,
+
+    ["True Pablo"] = function()
+        local model = workspace:FindFirstChild("TRUEPABLO")
+        local erororo = model and model:FindFirstChild("erororo")
+        return erororo and erororo:FindFirstChild("Head")
+    end,
+
+    ["King Multiverse"] = function()
+        local model = workspace:FindFirstChild("PabloCreation")
+        return model and model:FindFirstChild("Morph")
+    end,
+
+    ["ERRORSIPHONER"] = function()
+        local model = workspace:FindFirstChild("404")
+        return model and model:FindFirstChild("Head")
+    end,
+
+    ["Sansta"] = function()
+        local model = workspace:FindFirstChild("Sansta")
+        return model and model:FindFirstChild("Head")
+    end,
+
+    ["KJ"] = function()
+        return workspace:FindFirstChild("morph thing")
+    end,
+
+    ["HyperDust"] = function()
+        local model = workspace:FindFirstChild("LV21HYPERCHAR")
+        return model and model:FindFirstChild("Head")
+    end,
+
+    ["Spamton"] = function()
+        local model = workspace:FindFirstChild("SPAMTON")
+        return model and model:FindFirstChild("Head")
+    end,
+}
+
+AutoSpawn:CreateDropdown({
+    name = "Choose Morph",
+    options = morphs,
+    currentOption = "V404",
+    flag = "AutoSpawnMorph",
+    callback = function(value)
+        if type(value) == "table" then
+            selectedMorph = value[1]
+        else
+            selectedMorph = value
+        end
+    end,
+})
+
+AutoSpawn:CreateToggle({
+    name = "Auto Spawn",
+    flag = "AutoSpawnEnabled",
+    callback = function(value)
+        autoSpawnEnabled = value
+    end,
+})
+
+local function fireMorphTouch()
+    if not autoSpawnEnabled then
+        return
+    end
+
+    local character = game.Players.LocalPlayer.Character
+
+    if not character then
+        return
+    end
+
+    local root = character:FindFirstChild("HumanoidRootPart")
+
+    if not root then
+        return
+    end
+
+    local getPart = morphPaths[selectedMorph]
+
+    if not getPart then
+        return
+    end
+
+    local part = getPart()
+
+    if not part or not part:IsA("BasePart") then
+        return
+    end
+
+    local touchInterest = part:FindFirstChild("TouchInterest")
+
+    if not touchInterest then
+        return
+    end
+
+    firetouchinterest(root, part, 0)
+    task.wait(0.1)
+    firetouchinterest(root, part, 1)
+end
+
+game.Players.LocalPlayer.CharacterAdded:Connect(function()
+    if autoSpawnEnabled then
+        task.wait(1)
+        fireMorphTouch()
+    end
+end)
