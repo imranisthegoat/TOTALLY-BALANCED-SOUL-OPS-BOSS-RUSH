@@ -8,3 +8,8 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/imranisthegoat/TOTALL
 [![Reviewed on ScriptBlox](https://scriptblox.com/badge/SNOWGRAVE-+-ENDLESS-TBSOBR-AUTO-SKIPPER-230428)](https://scriptblox.com/script/SNOWGRAVE-+-ENDLESS-TBSOBR-AUTO-SKIPPER-230428)
 
 LES GO WE ON SCRIPTBLOX!!!
+
+*UPDATE 1 HALLOWEEN*
+ADDED LIMITED TIME HALLOWEEN TAB:
+tp to axes and portal. 
+Boss float, float without triggering anti cheat (does not block gaster blasters)
