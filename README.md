@@ -13,3 +13,5 @@ LES GO WE ON SCRIPTBLOX!!!
 ADDED LIMITED TIME HALLOWEEN TAB:
 tp to axes and portal. 
 Boss float, float without triggering anti cheat (does not block gaster blasters)
+ALSO ADDED AUTO SPAWN!
+NOW AUTO SPAWN AS YOUR CHOSEN CHARECTHER WHEN YOU DIE!
